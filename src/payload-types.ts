@@ -1532,6 +1532,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
 }
+
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header".
