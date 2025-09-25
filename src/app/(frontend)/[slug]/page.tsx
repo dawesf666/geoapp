@@ -12,6 +12,10 @@ import { RenderHero } from '@/heros/RenderHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
+import Map from '@/components/Custom/Map/MapBody'
+import HomePage from '@/components/Custom/HomeSec/HomeSec'
+import { AboutHero } from '@/components/Custom/AboutHero/AboutHero'
+import { Payload } from 'payload'
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -66,15 +70,60 @@ export default async function Page({ params: paramsPromise }: Args) {
   const { hero, layout } = page
 
   return (
-    <article className="pt-16 pb-24">
+    <article className="">
       <PageClient />
       {/* Allows redirects for valid pages too */}
       <PayloadRedirects disableNotFound url={url} />
 
       {draft && <LivePreviewListener />}
 
-      <RenderHero {...hero} />
-      <RenderBlocks blocks={layout} />
+      {slug === 'map' && (
+        <div className="w-full   ">
+          <RenderHero {...hero} />
+          <RenderBlocks blocks={layout} />
+          <div className="mx-auto px-4 lg:px-16">
+            <h2 className=" text-3xl font-bold mb-4">Consulta la mappa</h2>
+            <Map />
+          </div>
+        </div>
+      )}
+
+      {slug === 'home' && (
+        <>
+          <RenderHero {...hero} />
+          {/* <RenderBlocks blocks={layout} /> */}
+          <div className="mt-10">
+            {/* <RenderHero {...hero} /> */}
+            <HomePage />
+          </div>
+        </>
+      )}
+      {slug === 'about' && (
+        <>
+          <div className="">
+            <AboutHero />
+          </div>
+        </>
+      )}
+      {slug === 'blog' && (
+        <>
+          <RenderHero {...hero} />
+          <div className=" my-12">
+            <RenderBlocks blocks={layout} />
+          </div>
+        </>
+      )}
+      {slug === 'segnala' && (
+        <>
+          <RenderHero {...hero} />
+          <RenderBlocks blocks={layout} />
+        </>
+      )}
+      {slug === 'progetti' && (
+        <>
+          <RenderBlocks blocks={layout} />
+        </>
+      )}
     </article>
   )
 }

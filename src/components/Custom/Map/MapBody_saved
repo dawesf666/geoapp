@@ -1,0 +1,1468 @@
+//SECOND VERSION
+// 'use client'
+
+// import React, { useState, useMemo, useCallback } from 'react'
+// import * as turf from '@turf/turf'
+// import { LatLngExpression } from 'leaflet'
+// import { FeatureCollection } from 'geojson'
+
+// import CompareMap from './Map'
+// import FilterMap from './FilterMap'
+// import Sumburst from './charts/Sumburst'
+
+// // Import dei geojson
+// import italyMacro from './map_macro.json'
+// import italyRegions from './map_regions.json'
+// import italyProvinces from './map_provinces.json'
+// import italyMunicipalities from './map_municipalities.json'
+
+// // Mock data (in futuro arriveranno da DB)
+// import mockData from './mockData.json'
+
+// type Props = {
+//   data?: any[]
+// }
+
+// const ITALY_CENTER: LatLngExpression = [42.0, 12.0]
+
+// const ZOOM_LEVELS = {
+//   country: 6,
+//   macro: 6,
+//   region: 8,
+//   province: 9,
+//   municipality: 11,
+// }
+// type Filters = {
+//   tipologia?: string
+//   regione?: string
+//   comune?: string
+//   nome?: string
+//   proprietario?: string
+//   costruttore?: string
+//   stato?: string
+//   potenza?: string
+//   estensione?: string
+// }
+
+// const MapBody = ({ data = mockData.features }: Props) => {
+//   const [selectedArea, setSelectedArea] = useState<any>(null)
+//   const [filters, setFilters] = useState<Filters>({})
+
+//   // 🔹 Filtra dataset GeoJSON in base all’area selezionata
+//   const geoData = useMemo(() => {
+//     if (!selectedArea) {
+//       return italyMacro as FeatureCollection
+//     }
+
+//     if (selectedArea.type === 'macro') {
+//       return {
+//         type: 'FeatureCollection',
+//         features: (italyRegions as FeatureCollection).features.filter((f: any) =>
+//           selectedArea.acceptedRegions.includes(f.properties.reg_name),
+//         ),
+//       }
+//     }
+
+//     if (selectedArea.type === 'region') {
+//       return {
+//         type: 'FeatureCollection',
+//         features: (italyProvinces as FeatureCollection).features.filter(
+//           (f: any) => f.properties.reg_name === selectedArea.name,
+//         ),
+//       }
+//     }
+
+//     if (selectedArea.type === 'province') {
+//       return {
+//         type: 'FeatureCollection',
+//         features: (italyMunicipalities as FeatureCollection).features.filter(
+//           (f: any) => f.properties.prov_name === selectedArea.name,
+//         ),
+//       }
+//     }
+
+//     if (selectedArea.type === 'municipality') {
+//       return {
+//         type: 'FeatureCollection',
+//         features: (italyMunicipalities as FeatureCollection).features.filter(
+//           (f: any) => f.properties.name === selectedArea.name,
+//         ),
+//       }
+//     }
+
+//     return italyMacro
+//   }, [selectedArea])
+
+//   // 🔹 Dati filtrati per i filtri dinamici
+//   const filteredData = useMemo(() => {
+//     if (!selectedArea) return data
+
+//     if (selectedArea.type === 'region') {
+//       // console.log('DATA', data)
+//       // console.log({ selectedArea })
+//       return data.filter((d) => d.regione === selectedArea.name)
+//     }
+//     if (selectedArea.type === 'province') {
+//       return data.filter((d) => d.provincia === selectedArea.name)
+//     }
+//     if (selectedArea.type === 'municipality') {
+//       return data.filter((d) => d.comune === selectedArea.name)
+//     }
+
+//     return data
+//   }, [data, selectedArea])
+
+//   // 🔹 Zoom e focus dinamico
+//   const currentZoom = useMemo(() => {
+//     if (!selectedArea) {
+//       return {
+//         mapCenter: ITALY_CENTER,
+//         zoomLevel: ZOOM_LEVELS.country,
+//       }
+//     }
+
+//     const coords = turf.centerOfMass(selectedArea.feature.geometry).geometry.coordinates
+//     const mapCenter: LatLngExpression = [coords[1], coords[0]]
+
+//     return {
+//       mapCenter,
+//       zoomLevel: ZOOM_LEVELS[selectedArea.type] || ZOOM_LEVELS.country,
+//     }
+//   }, [selectedArea])
+
+//   // 🔹 Click su una feature
+//   // 🔹 Click su una feature
+//   const handleRegionClick = useCallback((event: any) => {
+//     const f = event.target.feature
+
+//     if (f.properties.Macroregione) {
+//       // Macro area (Nord/Centro/Sud Italia)
+//       const macro = f.properties.Macroregione
+//       let acceptedRegions: string[] = []
+
+//       if (macro === 'Nord Italia') {
+//         acceptedRegions = [
+//           `Valle d'Aosta/Vallée d'Aoste`,
+//           'Piemonte',
+//           'Liguria',
+//           'Lombardia',
+//           'Veneto',
+//           'Trentino-Alto Adige/Südtirol',
+//           'Friuli-Venezia Giulia',
+//           'Emilia-Romagna',
+//         ]
+//       } else if (macro === 'Centro Italia') {
+//         acceptedRegions = ['Toscana', 'Umbria', 'Marche', 'Lazio']
+//       } else if (macro === 'Sud Italia') {
+//         acceptedRegions = [
+//           'Abruzzo',
+//           'Molise',
+//           'Campania',
+//           'Puglia',
+//           'Basilicata',
+//           'Calabria',
+//           'Sicilia',
+//           'Sardegna',
+//         ]
+//       }
+
+//       setSelectedArea({
+//         type: 'macro',
+//         name: macro,
+//         acceptedRegions,
+//         feature: f,
+//       })
+//     } else if (f.properties.reg_name) {
+//       setSelectedArea({
+//         type: 'region',
+//         name: f.properties.reg_name,
+//         feature: f,
+//       })
+//     } else if (f.properties.prov_name) {
+//       setSelectedArea({
+//         type: 'province',
+//         name: f.properties.prov_name,
+//         feature: f,
+//       })
+//     } else if (f.properties.name) {
+//       setSelectedArea({
+//         type: 'municipality',
+//         name: f.properties.name,
+//         feature: f,
+//       })
+//     }
+//   }, [])
+
+//   // 🔹 Torna indietro di un livello
+//   const handleBackClick = useCallback(() => {
+//     setSelectedArea(null)
+//   }, [])
+
+//   return (
+//     <div className="block lg:flex w-full mx-auto">
+//       {/* Mappa */}
+//       <div className="block w-full lg:w-2/3 mt-10">
+//         <div className="p-2 shadow-2xl rounded-xl">
+//           <CompareMap
+//             mapCenter={currentZoom.mapCenter}
+//             zoomLevel={currentZoom.zoomLevel}
+//             geoData={geoData}
+//             onBack={handleBackClick}
+//             onRegionClick={handleRegionClick}
+//           />
+//         </div>
+//       </div>
+
+//       {/* Filtri + Sunburst */}
+//       <div className="p-2 shadow-2xl rounded-xl mt-10 w-full lg:w-1/3">
+//         {/* <FilterMap data={filteredData} /> */}
+//         <Sumburst />
+//       </div>
+//     </div>
+//   )
+// }
+
+// export default MapBody
+
+//THIRD VERSION
+// 'use client'
+
+// import React, { useState, useMemo, useCallback, useEffect } from 'react'
+// import * as turf from '@turf/turf'
+// import { LatLngExpression } from 'leaflet'
+// import { FeatureCollection } from 'geojson'
+
+// import CompareMap from './Map'
+// import FilterMap from './FilterMap'
+// import Sumburst from './charts/Sumburst'
+
+// // Import dei geojson
+// import italyMacro from './map_macro.json'
+// import italyRegions from './map_regions.json'
+// import italyProvinces from './map_provinces.json'
+// import italyMunicipalities from './map_municipalities.json'
+
+// // Mock data
+// import mockData from './mockData.json'
+
+// type Props = {
+//   data?: any[]
+// }
+
+// const ITALY_CENTER: LatLngExpression = [42.0, 12.0]
+
+// const ZOOM_LEVELS = {
+//   country: 6,
+//   macro: 6,
+//   region: 8,
+//   province: 9,
+//   municipality: 11,
+// }
+
+// type Filters = {
+//   tipologia?: string
+//   regione?: string
+//   comune?: string
+//   nome?: string
+//   proprietario?: string
+//   costruttore?: string
+//   stato?: string
+//   potenza?: string
+//   estensione?: string
+// }
+
+// const MapBody = ({ data = mockData.features }: Props) => {
+//   const [selectedArea, setSelectedArea] = useState<any>(null)
+//   const [filters, setFilters] = useState<Filters>({})
+
+//   // 🔹 Gestione cambio filtro
+//   const handleFilterChange = useCallback((key: keyof Filters, value: string | undefined) => {
+//     setFilters((prev) => {
+//       const newFilters = { ...prev, [key]: value }
+
+//       // sincronizza con mappa
+//       if (key === 'regione' && value) {
+//         const regionFeature = (italyRegions as FeatureCollection).features.find(
+//           (f: any) => f.properties.reg_name === value,
+//         )
+//         if (regionFeature) {
+//           setSelectedArea({
+//             type: 'region',
+//             name: value,
+//             feature: regionFeature,
+//           })
+//         }
+//       }
+
+//       if (key === 'comune' && value) {
+//         const comuneFeature = (italyMunicipalities as FeatureCollection).features.find(
+//           (f: any) => f.properties.name === value,
+//         )
+//         if (comuneFeature) {
+//           setSelectedArea({
+//             type: 'municipality',
+//             name: value,
+//             feature: comuneFeature,
+//           })
+//         }
+//       }
+
+//       return newFilters
+//     })
+//   }, [])
+
+//   // 🔹 Filtra dataset GeoJSON in base all’area selezionata
+//   const geoData = useMemo(() => {
+//     if (!selectedArea) {
+//       return italyMacro as FeatureCollection
+//     }
+
+//     if (selectedArea.type === 'macro') {
+//       return {
+//         type: 'FeatureCollection',
+//         features: (italyRegions as FeatureCollection).features.filter((f: any) =>
+//           selectedArea.acceptedRegions.includes(f.properties.reg_name),
+//         ),
+//       }
+//     }
+
+//     if (selectedArea.type === 'region') {
+//       return {
+//         type: 'FeatureCollection',
+//         features: (italyProvinces as FeatureCollection).features.filter(
+//           (f: any) => f.properties.reg_name === selectedArea.name,
+//         ),
+//       }
+//     }
+
+//     if (selectedArea.type === 'province') {
+//       return {
+//         type: 'FeatureCollection',
+//         features: (italyMunicipalities as FeatureCollection).features.filter(
+//           (f: any) => f.properties.prov_name === selectedArea.name,
+//         ),
+//       }
+//     }
+
+//     if (selectedArea.type === 'municipality') {
+//       return {
+//         type: 'FeatureCollection',
+//         features: (italyMunicipalities as FeatureCollection).features.filter(
+//           (f: any) => f.properties.name === selectedArea.name,
+//         ),
+//       }
+//     }
+
+//     return italyMacro
+//   }, [selectedArea])
+
+//   // 🔹 Dati filtrati per i filtri dinamici
+//   const filteredData = useMemo(() => {
+//     let filtered = data
+
+//     if (filters.regione) {
+//       filtered = filtered.filter((d) => d.regione === filters.regione)
+//     }
+//     if (filters.comune) {
+//       filtered = filtered.filter((d) => d.comune === filters.comune)
+//     }
+//     if (filters.tipologia) {
+//       filtered = filtered.filter((d) => d.tipologia === filters.tipologia)
+//     }
+
+//     return filtered
+//   }, [data, filters])
+
+//   // 🔹 Zoom e focus dinamico
+//   const currentZoom = useMemo(() => {
+//     if (!selectedArea) {
+//       return {
+//         mapCenter: ITALY_CENTER,
+//         zoomLevel: ZOOM_LEVELS.country,
+//       }
+//     }
+
+//     const coords = turf.centerOfMass(selectedArea.feature.geometry).geometry.coordinates
+//     const mapCenter: LatLngExpression = [coords[1], coords[0]]
+
+//     return {
+//       mapCenter,
+//       zoomLevel: ZOOM_LEVELS[selectedArea.type] || ZOOM_LEVELS.country,
+//     }
+//   }, [selectedArea])
+
+//   // 🔹 Click su una feature
+//   const handleRegionClick = useCallback((event: any) => {
+//     const f = event.target.feature
+
+//     if (f.properties.Macroregione) {
+//       const macro = f.properties.Macroregione
+//       let acceptedRegions: string[] = []
+
+//       if (macro === 'Nord Italia') {
+//         acceptedRegions = [
+//           `Valle d'Aosta/Vallée d'Aoste`,
+//           'Piemonte',
+//           'Liguria',
+//           'Lombardia',
+//           'Veneto',
+//           'Trentino-Alto Adige/Südtirol',
+//           'Friuli-Venezia Giulia',
+//           'Emilia-Romagna',
+//         ]
+//       } else if (macro === 'Centro Italia') {
+//         acceptedRegions = ['Toscana', 'Umbria', 'Marche', 'Lazio']
+//       } else if (macro === 'Sud Italia') {
+//         acceptedRegions = [
+//           'Abruzzo',
+//           'Molise',
+//           'Campania',
+//           'Puglia',
+//           'Basilicata',
+//           'Calabria',
+//           'Sicilia',
+//           'Sardegna',
+//         ]
+//       }
+
+//       setSelectedArea({
+//         type: 'macro',
+//         name: macro,
+//         acceptedRegions,
+//         feature: f,
+//       })
+//       setFilters((prev) => ({ ...prev, regione: undefined, comune: undefined }))
+//     } else if (f.properties.reg_name) {
+//       setSelectedArea({
+//         type: 'region',
+//         name: f.properties.reg_name,
+//         feature: f,
+//       })
+//       setFilters((prev) => ({
+//         ...prev,
+//         regione: f.properties.reg_name,
+//         comune: undefined,
+//       }))
+//     } else if (f.properties.prov_name) {
+//       setSelectedArea({
+//         type: 'province',
+//         name: f.properties.prov_name,
+//         feature: f,
+//       })
+//     } else if (f.properties.name) {
+//       setSelectedArea({
+//         type: 'municipality',
+//         name: f.properties.name,
+//         feature: f,
+//       })
+//       setFilters((prev) => ({ ...prev, comune: f.properties.name }))
+//     }
+//   }, [])
+
+//   // 🔹 Torna indietro di un livello
+//   const handleBackClick = useCallback(() => {
+//     setSelectedArea(null)
+//     setFilters({})
+//   }, [])
+
+//   return (
+//     <div className="block lg:flex w-full mx-auto">
+//       {/* Mappa */}
+//       <div className="block w-full lg:w-2/3 mt-10">
+//         <div className="p-2 shadow-2xl rounded-xl">
+//           <CompareMap
+//             mapCenter={currentZoom.mapCenter}
+//             zoomLevel={currentZoom.zoomLevel}
+//             geoData={geoData}
+//             onBack={handleBackClick}
+//             onRegionClick={handleRegionClick}
+//           />
+//         </div>
+//       </div>
+
+//       {/* Filtri + Sunburst */}
+//       <div className="p-2 shadow-2xl rounded-xl mt-10 w-full lg:w-1/3">
+//         <FilterMap
+//           data={filteredData}
+//           filters={filters}
+//           onFilterChange={handleFilterChange}
+//           selectedArea={selectedArea}
+//         />
+//         <Sumburst />
+//       </div>
+//     </div>
+//   )
+// }
+
+// export default MapBody
+
+//4TH VERSION
+// 'use client'
+// import React, { useState, useMemo, useCallback, useEffect } from 'react'
+// import * as turf from '@turf/turf'
+// import { LatLngExpression } from 'leaflet'
+// import { FeatureCollection } from 'geojson'
+
+// import CompareMap from './Map'
+// import FilterMap from './FilterMap'
+// import Sumburst from './charts/Sumburst'
+
+// import italyMacro from './map_macro.json'
+// import italyRegions from './map_regions.json'
+// import italyProvinces from './map_provinces.json'
+// import italyMunicipalities from './map_municipalities.json'
+
+// // Mock data punti
+// import mockData from './mockData.json'
+
+// type Props = {
+//   data?: any[]
+// }
+
+// const ITALY_CENTER: LatLngExpression = [42.0, 12.0]
+
+// const ZOOM_LEVELS = {
+//   country: 6,
+//   macro: 6,
+//   region: 8,
+//   province: 9,
+//   municipality: 11,
+// }
+
+// type Filters = {
+//   tipologia?: string
+//   regione?: string
+//   comune?: string
+//   nome?: string
+//   proprietario?: string
+//   costruttore?: string
+//   stato?: string
+//   potenza?: string
+//   estensione?: string
+// }
+
+// const MapBody = ({ data = mockData.features }: Props) => {
+//   const [selectedArea, setSelectedArea] = useState<any>(null)
+//   const [filters, setFilters] = useState<Filters>({})
+
+//   // 🔹 Aggiorna selectedArea quando cambia un filtro
+//   useEffect(() => {
+//     if (filters.regione) {
+//       const f = italyRegions.features.find((r: any) => r.properties.reg_name === filters.regione)
+//       if (f) setSelectedArea({ type: 'region', name: filters.regione, feature: f })
+//     } else if (filters.comune) {
+//       const f = italyMunicipalities.features.find((m: any) => m.properties.name === filters.comune)
+//       if (f) setSelectedArea({ type: 'municipality', name: filters.comune, feature: f })
+//     } else if (!filters.regione && !filters.comune) {
+//       setSelectedArea(null)
+//     }
+//   }, [filters.regione, filters.comune])
+
+//   // 🔹 Filtra GeoJSON in base all'area selezionata
+//   const geoData = useMemo(() => {
+//     if (!selectedArea) return italyMacro
+
+//     if (selectedArea.type === 'macro') {
+//       return {
+//         type: 'FeatureCollection',
+//         features: italyRegions.features.filter((f: any) =>
+//           selectedArea.acceptedRegions.includes(f.properties.reg_name),
+//         ),
+//       }
+//     }
+
+//     if (selectedArea.type === 'region') {
+//       return {
+//         type: 'FeatureCollection',
+//         features: italyProvinces.features.filter(
+//           (f: any) => f.properties.reg_name === selectedArea.name,
+//         ),
+//       }
+//     }
+
+//     if (selectedArea.type === 'province') {
+//       return {
+//         type: 'FeatureCollection',
+//         features: italyMunicipalities.features.filter(
+//           (f: any) => f.properties.prov_name === selectedArea.name,
+//         ),
+//       }
+//     }
+
+//     if (selectedArea.type === 'municipality') {
+//       return {
+//         type: 'FeatureCollection',
+//         features: italyMunicipalities.features.filter(
+//           (f: any) => f.properties.name === selectedArea.name,
+//         ),
+//       }
+//     }
+
+//     return italyMacro
+//   }, [selectedArea])
+
+//   // 🔹 Dati filtrati in base a filtri e area selezionata
+//   const filteredData = useMemo(() => {
+//     return data.filter((d) => {
+//       return (
+//         (!filters.tipologia || d.tipologia === filters.tipologia) &&
+//         (!filters.regione || d.regione === filters.regione) &&
+//         (!filters.comune || d.comune === filters.comune) &&
+//         (!filters.nome || d.nome === filters.nome) &&
+//         (!filters.proprietario || d.proprietario === filters.proprietario) &&
+//         (!filters.costruttore || d.costruttore === filters.costruttore) &&
+//         (!filters.stato || d.stato === filters.stato) &&
+//         (!filters.potenza || d.potenza === filters.potenza) &&
+//         (!filters.estensione || d.estensione === filters.estensione)
+//       )
+//     })
+//   }, [data, filters])
+
+//   // 🔹 Zoom e centro dinamico
+//   const currentZoom = useMemo(() => {
+//     if (!selectedArea) return { mapCenter: ITALY_CENTER, zoomLevel: ZOOM_LEVELS.country }
+//     const coords = turf.centerOfMass(selectedArea.feature.geometry).geometry.coordinates
+//     return {
+//       mapCenter: [coords[1], coords[0]] as LatLngExpression,
+//       zoomLevel: ZOOM_LEVELS[selectedArea.type],
+//     }
+//   }, [selectedArea])
+
+//   // 🔹 Click su mappa
+//   const handleRegionClick = useCallback((event: any) => {
+//     const f = event.target.feature
+//     if (f.properties.Macroregione) {
+//       const macro = f.properties.Macroregione
+//       let acceptedRegions: string[] = []
+//       if (macro === 'Nord Italia') {
+//         acceptedRegions = [
+//           `Valle d'Aosta/Vallée d'Aoste`,
+//           'Piemonte',
+//           'Liguria',
+//           'Lombardia',
+//           'Veneto',
+//           'Trentino-Alto Adige/Südtirol',
+//           'Friuli-Venezia Giulia',
+//           'Emilia-Romagna',
+//         ]
+//       } else if (macro === 'Centro Italia') {
+//         acceptedRegions = ['Toscana', 'Umbria', 'Marche', 'Lazio']
+//       } else if (macro === 'Sud Italia') {
+//         acceptedRegions = [
+//           'Abruzzo',
+//           'Molise',
+//           'Campania',
+//           'Puglia',
+//           'Basilicata',
+//           'Calabria',
+//           'Sicilia',
+//           'Sardegna',
+//         ]
+//       }
+//       setSelectedArea({ type: 'macro', name: macro, acceptedRegions, feature: f })
+//       setFilters({})
+//     } else if (f.properties.reg_name) {
+//       setSelectedArea({ type: 'region', name: f.properties.reg_name, feature: f })
+//       setFilters({ regione: f.properties.reg_name })
+//     } else if (f.properties.prov_name) {
+//       setSelectedArea({ type: 'province', name: f.properties.prov_name, feature: f })
+//       setFilters({ regione: f.properties.reg_name, comune: f.properties.prov_name })
+//     } else if (f.properties.name) {
+//       setSelectedArea({ type: 'municipality', name: f.properties.name, feature: f })
+//       // setFilters({ regione: f.properties.reg_name, comune: f.properties.name })
+//       setFilters({})
+//     }
+//   }, [])
+
+//   // 🔹 Torna indietro di un livello
+//   const handleBackClick = useCallback(() => {
+//     setSelectedArea(null)
+//     setFilters({})
+//   }, [])
+
+//   // 🔹 Aggiornamento filtro selezionato
+//   const handleFilterChange = (key: keyof Filters, value: string | undefined) => {
+//     setFilters((prev) => ({ ...prev, [key]: value }))
+//   }
+
+//   return (
+//     <div className="block lg:flex w-full mx-auto">
+//       <div className="block w-full lg:w-2/3 mt-10">
+//         <div className="p-2 shadow-2xl rounded-xl">
+//           <CompareMap
+//             mapCenter={currentZoom.mapCenter}
+//             zoomLevel={currentZoom.zoomLevel}
+//             geoData={geoData}
+//             onBack={handleBackClick}
+//             onRegionClick={handleRegionClick}
+//           />
+//         </div>
+//       </div>
+
+//       <div className="p-2 shadow-2xl rounded-xl mt-10 w-full lg:w-1/3">
+//         <FilterMap
+//           filters={filters}
+//           onFilterChange={handleFilterChange}
+//           data={filteredData}
+//           selectedArea={selectedArea}
+//         />
+//         <div className="flex justify-center align-center">
+//           <Sumburst />
+//         </div>
+//       </div>
+//     </div>
+//   )
+// }
+
+// export default MapBody
+
+//5TH VERSION
+// 'use client'
+// import React, { useState, useMemo, useCallback, useEffect } from 'react'
+// import * as turf from '@turf/turf'
+// import { LatLngExpression } from 'leaflet'
+// import { FeatureCollection } from 'geojson'
+
+// import CompareMap from './Map'
+// import FilterMap from './FilterMap'
+// import Sumburst from './charts/Sumburst'
+
+// import italyMacro from './map_macro.json'
+// import italyRegions from './map_regions.json'
+// import italyProvinces from './map_provinces.json'
+// import italyMunicipalities from './map_municipalities.json'
+
+// // Mock data punti
+// import mockData from './mockData.json'
+
+// type Props = { data?: any[] }
+
+// const ITALY_CENTER: LatLngExpression = [42.0, 12.0]
+
+// const ZOOM_LEVELS = {
+//   country: 6,
+//   macro: 6,
+//   region: 8,
+//   province: 9,
+//   municipality: 11,
+// }
+
+// type Filters = {
+//   tipologia?: string
+//   regione?: string
+//   comune?: string
+//   nome?: string
+//   proprietario?: string
+//   costruttore?: string
+//   stato?: string
+//   potenza?: string
+//   estensione?: string
+// }
+
+// const MapBody = ({ data = mockData.features }: Props) => {
+//   const [selectedArea, setSelectedArea] = useState<any>(null)
+//   const [filters, setFilters] = useState<Filters>({})
+
+//   // 🔹 Aggiornamento filtro selezionato
+//   const handleFilterChange = (key: keyof Filters, value: string | undefined) => {
+//     setFilters((prev) => ({ ...prev, [key]: value }))
+//   }
+
+//   // 🔹 Aggiorna selectedArea quando cambia un filtro regione o comune
+//   useEffect(() => {
+//     if (filters.comune) {
+//       const f = italyMunicipalities.features.find((m: any) => m.properties.name === filters.comune)
+//       if (f) setSelectedArea({ type: 'municipality', name: filters.comune, feature: f })
+//     } else if (filters.regione) {
+//       const f = italyRegions.features.find((r: any) => r.properties.reg_name === filters.regione)
+//       if (f) setSelectedArea({ type: 'region', name: filters.regione, feature: f })
+//     } else {
+//       setSelectedArea(null)
+//     }
+//   }, [filters.regione, filters.comune])
+
+//   // 🔹 Filtra GeoJSON in base all'area selezionata
+//   const geoData = useMemo(() => {
+//     if (!selectedArea) return italyMacro
+
+//     switch (selectedArea.type) {
+//       case 'macro':
+//         return {
+//           type: 'FeatureCollection',
+//           features: italyRegions.features.filter((f: any) =>
+//             selectedArea.acceptedRegions.includes(f.properties.reg_name),
+//           ),
+//         }
+//       case 'region':
+//         return {
+//           type: 'FeatureCollection',
+//           features: italyProvinces.features.filter(
+//             (f: any) => f.properties.reg_name === selectedArea.name,
+//           ),
+//         }
+//       case 'province':
+//         return {
+//           type: 'FeatureCollection',
+//           features: italyMunicipalities.features.filter(
+//             (f: any) => f.properties.prov_name === selectedArea.name,
+//           ),
+//         }
+//       case 'municipality':
+//         return {
+//           type: 'FeatureCollection',
+//           features: italyMunicipalities.features.filter(
+//             (f: any) => f.properties.name === selectedArea.name,
+//           ),
+//         }
+//       default:
+//         return italyMacro
+//     }
+//   }, [selectedArea])
+
+//   // 🔹 Filtra dati in base a filtri selezionati
+//   const filteredData = useMemo(() => {
+//     return data.filter((d) => {
+//       return (
+//         (!filters.tipologia || d.tipologia === filters.tipologia) &&
+//         (!filters.regione || d.regione === filters.regione) &&
+//         (!filters.comune || d.comune === filters.comune) &&
+//         (!filters.nome || d.nome === filters.nome) &&
+//         (!filters.proprietario || d.proprietario === filters.proprietario) &&
+//         (!filters.costruttore || d.costruttore === filters.costruttore) &&
+//         (!filters.stato || d.stato === filters.stato) &&
+//         (!filters.potenza || d.potenza === filters.potenza) &&
+//         (!filters.estensione || d.estensione === filters.estensione)
+//       )
+//     })
+//   }, [data, filters])
+
+//   // 🔹 Zoom e centro dinamico
+//   const currentZoom = useMemo(() => {
+//     if (!selectedArea) return { mapCenter: ITALY_CENTER, zoomLevel: ZOOM_LEVELS.country }
+//     const coords = turf.centerOfMass(selectedArea.feature.geometry).geometry.coordinates
+//     return {
+//       mapCenter: [coords[1], coords[0]] as LatLngExpression,
+//       zoomLevel: ZOOM_LEVELS[selectedArea.type],
+//     }
+//   }, [selectedArea])
+
+//   // 🔹 Click su mappa
+//   const handleRegionClick = useCallback((event: any) => {
+//     const f = event.target.feature
+//     if (f.properties.Macroregione) {
+//       const macro = f.properties.Macroregione
+//       let acceptedRegions: string[] = []
+//       if (macro === 'Nord Italia') {
+//         acceptedRegions = [
+//           `Valle d'Aosta/Vallée d'Aoste`,
+//           'Piemonte',
+//           'Liguria',
+//           'Lombardia',
+//           'Veneto',
+//           'Trentino-Alto Adige/Südtirol',
+//           'Friuli-Venezia Giulia',
+//           'Emilia-Romagna',
+//         ]
+//       } else if (macro === 'Centro Italia') {
+//         acceptedRegions = ['Toscana', 'Umbria', 'Marche', 'Lazio']
+//       } else if (macro === 'Sud Italia') {
+//         acceptedRegions = [
+//           'Abruzzo',
+//           'Molise',
+//           'Campania',
+//           'Puglia',
+//           'Basilicata',
+//           'Calabria',
+//           'Sicilia',
+//           'Sardegna',
+//         ]
+//       }
+//       setSelectedArea({ type: 'macro', name: macro, acceptedRegions, feature: f })
+//       setFilters({})
+//     } else if (f.properties.reg_name) {
+//       console.log('REG', f.properties)
+//       setSelectedArea({ type: 'region', name: f.properties.reg_name, feature: f })
+//       setFilters({ regione: f.properties.reg_name })
+//     } else if (f.properties.prov_name) {
+//       console.log('PROV', f.properties)
+//       setSelectedArea({ type: 'province', name: f.properties.prov_name, feature: f })
+//       setFilters({ regione: f.properties.reg_name, comune: f.properties.prov_name })
+//     } else if (f.properties.name) {
+//       console.log('MUN', f.properties)
+//       setSelectedArea({ type: 'municipality', name: f.properties.name, feature: f })
+//       setFilters({ comune: f.properties.name })
+//     }
+//   }, [])
+
+//   // 🔹 Torna indietro
+//   const handleBackClick = useCallback(() => {
+//     setSelectedArea(null)
+//     setFilters({})
+//   }, [])
+
+//   return (
+//     <div className="block lg:flex w-full mx-auto">
+//       <div className="block w-full lg:w-2/3 mt-10">
+//         <div className="p-2 shadow-2xl rounded-xl">
+//           <CompareMap
+//             mapCenter={currentZoom.mapCenter}
+//             zoomLevel={currentZoom.zoomLevel}
+//             geoData={geoData}
+//             onBack={handleBackClick}
+//             onRegionClick={handleRegionClick}
+//           />
+//         </div>
+//       </div>
+
+//       <div className="p-2 shadow-2xl rounded-xl mt-10 w-full lg:w-1/3">
+//         <FilterMap
+//           filters={filters}
+//           onFilterChange={handleFilterChange}
+//           data={filteredData}
+//           selectedArea={selectedArea}
+//         />
+//         <div className="flex justify-center align-center mt-4">
+//           <Sumburst />
+//         </div>
+//       </div>
+//     </div>
+//   )
+// }
+
+// export default MapBody
+
+//6TH VERSION
+// 'use client'
+// import React, { useState, useMemo, useCallback } from 'react'
+// import * as turf from '@turf/turf'
+// import { LatLngExpression } from 'leaflet'
+// import { FeatureCollection } from 'geojson'
+
+// import CompareMap from './Map'
+// import FilterMap from './FilterMap'
+// import Sumburst from './charts/Sumburst'
+
+// import italyMacro from './map_macro.json'
+// import italyRegions from './map_regions.json'
+// import italyProvinces from './map_provinces.json'
+// import italyMunicipalities from './map_municipalities.json'
+
+// // Mock data punti
+// import mockData from './mockData.json'
+
+// type Props = {
+//   data?: any[]
+// }
+
+// const ITALY_CENTER: LatLngExpression = [42.0, 12.0]
+
+// const ZOOM_LEVELS = {
+//   country: 6,
+//   macro: 7,
+//   region: 8,
+//   province: 9,
+//   municipality: 11,
+// }
+
+// type Filters = {
+//   tipologia?: string
+//   regione?: string
+//   comune?: string
+//   nome?: string
+//   proprietario?: string
+//   costruttore?: string
+//   stato?: string
+//   potenza?: string
+//   estensione?: string
+// }
+
+// const MapBody = ({ data = mockData.features }: Props) => {
+//   const [selectedArea, setSelectedArea] = useState<any>(null)
+//   const [filters, setFilters] = useState<Filters>({})
+
+//   // 🔹 Click su mappa
+//   const handleRegionClick = useCallback((event: any) => {
+//     const f = event.target.feature
+//     if (f.properties.Macroregione) {
+//       const macro = f.properties.Macroregione
+//       let acceptedRegions: string[] = []
+
+//       if (macro === 'Nord Italia') {
+//         acceptedRegions = [
+//           `Valle d'Aosta/Vallée d'Aoste`,
+//           'Piemonte',
+//           'Liguria',
+//           'Lombardia',
+//           'Veneto',
+//           'Trentino-Alto Adige/Südtirol',
+//           'Friuli-Venezia Giulia',
+//           'Emilia-Romagna',
+//         ]
+//       } else if (macro === 'Centro Italia') {
+//         acceptedRegions = ['Toscana', 'Umbria', 'Marche', 'Lazio']
+//       } else if (macro === 'Sud Italia') {
+//         acceptedRegions = [
+//           'Abruzzo',
+//           'Molise',
+//           'Campania',
+//           'Puglia',
+//           'Basilicata',
+//           'Calabria',
+//           'Sicilia',
+//           'Sardegna',
+//         ]
+//       }
+
+//       setSelectedArea({ type: 'macro', name: macro, acceptedRegions, feature: f })
+//       setFilters({}) // reset all filters
+//     } else if (f.properties.reg_name) {
+//       setSelectedArea({ type: 'region', name: f.properties.reg_name, feature: f })
+//       setFilters({ regione: f.properties.reg_name })
+//     } else if (f.properties.prov_name) {
+//       setSelectedArea({ type: 'province', name: f.properties.prov_name, feature: f })
+//       setFilters({ regione: f.properties.reg_name }) // do not set comune yet
+//     } else if (f.properties.name) {
+//       setSelectedArea({ type: 'municipality', name: f.properties.name, feature: f })
+//       setFilters({ comune: f.properties.name })
+//     }
+//   }, [])
+
+//   // 🔹 Torna indietro di un livello
+//   const handleBackClick = useCallback(() => {
+//     setSelectedArea(null)
+//     setFilters({})
+//   }, [])
+
+//   // 🔹 Aggiornamento filtro selezionato
+//   const handleFilterChange = (key: keyof Filters, value: string | undefined) => {
+//     setFilters((prev) => ({ ...prev, [key]: value }))
+
+//     // Aggiorna anche selectedArea se necessario per zoom
+//     if (key === 'regione' && value) {
+//       const f = italyRegions.features.find((r: any) => r.properties.reg_name === value)
+//       if (f) setSelectedArea({ type: 'region', name: value, feature: f })
+//     } else if (key === 'comune' && value) {
+//       const f = italyMunicipalities.features.find((m: any) => m.properties.name === value)
+//       if (f) setSelectedArea({ type: 'municipality', name: value, feature: f })
+//     } else if ((key === 'regione' && !value) || (key === 'comune' && !value)) {
+//       setSelectedArea(null)
+//     }
+//   }
+
+//   // 🔹 Filtra GeoJSON per mappa
+//   const geoData = useMemo(() => {
+//     if (!selectedArea) return italyMacro
+
+//     switch (selectedArea.type) {
+//       case 'macro':
+//         return {
+//           type: 'FeatureCollection',
+//           features: italyRegions.features.filter((f: any) =>
+//             selectedArea.acceptedRegions.includes(f.properties.reg_name),
+//           ),
+//         }
+//       case 'region':
+//         return {
+//           type: 'FeatureCollection',
+//           features: italyProvinces.features.filter(
+//             (f: any) => f.properties.reg_name === selectedArea.name,
+//           ),
+//         }
+//       case 'province':
+//         return {
+//           type: 'FeatureCollection',
+//           features: italyMunicipalities.features.filter(
+//             (f: any) => f.properties.prov_name === selectedArea.name,
+//           ),
+//         }
+//       case 'municipality':
+//         return {
+//           type: 'FeatureCollection',
+//           features: italyMunicipalities.features.filter(
+//             (f: any) => f.properties.name === selectedArea.name,
+//           ),
+//         }
+//       default:
+//         return italyMacro
+//     }
+//   }, [selectedArea])
+
+//   // 🔹 Dati filtrati in base a filtri e area selezionata
+//   const filteredData = useMemo(() => {
+//     return data.filter((d) => {
+//       return (
+//         (!filters.tipologia || d.tipologia === filters.tipologia) &&
+//         (!filters.regione || d.regione === filters.regione) &&
+//         (!filters.comune || d.comune === filters.comune) &&
+//         (!filters.nome || d.nome === filters.nome) &&
+//         (!filters.proprietario || d.proprietario === filters.proprietario) &&
+//         (!filters.costruttore || d.costruttore === filters.costruttore) &&
+//         (!filters.stato || d.stato === filters.stato) &&
+//         (!filters.potenza || d.potenza === filters.potenza) &&
+//         (!filters.estensione || d.estensione === filters.estensione)
+//       )
+//     })
+//   }, [data, filters])
+
+//   // 🔹 Zoom e centro dinamico
+//   const currentZoom = useMemo(() => {
+//     console.log({ selectedArea })
+//     if (!selectedArea) return { mapCenter: ITALY_CENTER, zoomLevel: ZOOM_LEVELS.country }
+//     const coords = turf.centerOfMass(selectedArea.feature.geometry).geometry.coordinates
+
+//     return {
+//       mapCenter: [coords[1], coords[0]] as LatLngExpression,
+//       zoomLevel: ZOOM_LEVELS[selectedArea.type],
+//     }
+//   }, [selectedArea])
+
+//   return (
+//     <div className="block lg:flex w-full mx-auto">
+//       {/* Mappa */}
+//       <div className="block w-full lg:w-2/3 mt-10">
+//         <div className="p-2 shadow-2xl rounded-xl">
+//           <CompareMap
+//             mapCenter={currentZoom.mapCenter}
+//             zoomLevel={currentZoom.zoomLevel}
+//             geoData={geoData}
+//             onBack={handleBackClick}
+//             onRegionClick={handleRegionClick}
+//           />
+//         </div>
+//       </div>
+
+//     </div>
+//   )
+// }
+
+// export default MapBody
+
+//7TH VERSION
+// MapBody.tsx
+// MapBody.tsx
+'use client'
+
+import React, { useCallback, useMemo, useState } from 'react'
+import * as turf from '@turf/turf'
+import { LatLngExpression } from 'leaflet'
+import { FeatureCollection } from 'geojson'
+
+import CompareMap from './Map'
+import FilterMap from './FilterMap'
+import Sumburst from './charts/Sumburst'
+
+import italyMacro from './statics/map_macro.json'
+//import italyMacro from './statics/test.json'
+import italyRegions from './statics/map_regions.json'
+import italyProvinces from './statics/map_provinces.json'
+import italyMunicipalities from './statics/map_municipalities.json'
+import mockData from './mockData.json'
+
+type Props = { data?: any[] }
+
+type Filters = {
+  tipologia?: string
+  regione?: string
+  comune?: string
+  nome?: string
+  proprietario?: string
+  costruttore?: string
+  stato?: string
+  potenza?: string
+  estensione?: string
+}
+
+const ITALY_CENTER: LatLngExpression = [42.0, 12.0]
+const ZOOM_LEVELS = { country: 6, macro: 8, region: 9, province: 10, municipality: 12 } as const
+
+export default function MapBody({ data = (mockData as any).features }: Props) {
+  const [selectedArea, setSelectedArea] = useState<{
+    type: 'macro' | 'region' | 'province' | 'municipality'
+    name: string
+    feature: any
+    acceptedRegions?: string[]
+  } | null>(null)
+
+  const [filters, setFilters] = useState<Filters>({})
+
+  // Build Sunburst data: Tipologia -> Regione -> Comune -> value (count)
+  function buildSunburst(data: any[]) {
+    // tipologia -> regione -> comune -> count
+    const tree: Record<string, Record<string, Record<string, number>>> = {}
+
+    for (const d of data) {
+      const tip = d.tipologia ?? 'N/D'
+      const reg = d.regione ?? 'N/D'
+      const com = d.comune ?? 'N/D'
+      tree[tip] ??= {}
+      tree[tip][reg] ??= {}
+      tree[tip][reg][com] = (tree[tip][reg][com] ?? 0) + 1
+    }
+
+    // convert to the structure your Sunburst expects
+    const root: any[] = []
+    for (const [tipologia, regMap] of Object.entries(tree)) {
+      const tipNode: any = { name: tipologia, children: [] as any[] }
+
+      for (const [regione, comMap] of Object.entries(regMap)) {
+        const children = Object.entries(comMap).map(([comune, count]) => ({
+          name: comune,
+          value: count,
+        }))
+        const value = children.reduce((s, c) => s + (c.value || 0), 0)
+        tipNode.children.push({ name: regione, value, children })
+      }
+
+      root.push(tipNode)
+    }
+
+    return root
+  }
+
+  function toPointFC(rows: any[]) {
+    // rows[i].coordinates is [lat, lon] in your mock; GeoJSON needs [lon, lat]
+    const features = rows
+      .filter((r) => Array.isArray(r.coordinates) && r.coordinates.length === 2)
+      .map((r) => {
+        const [lat, lon] = r.coordinates
+        const lonlat = [lon, lat] // swap to [lon, lat]
+        return {
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: lonlat },
+          properties: {
+            ...r,
+            // choose what to show in popup:
+            popupTitle: r.nome ?? r.tipologia ?? 'Punto',
+            popupSubtitle: `${r.regione ?? ''} ${r.comune ?? ''}`.trim(),
+          },
+        }
+      })
+
+    return { type: 'FeatureCollection', features }
+  }
+  // ---------- GEOJSON shown on the map (drill-down purely by selectedArea)
+  const geoData = useMemo<FeatureCollection>(() => {
+    if (!selectedArea) return italyMacro as FeatureCollection
+
+    const REG = italyRegions as FeatureCollection
+    const PROV = italyProvinces as FeatureCollection
+    const MUNI = italyMunicipalities as FeatureCollection
+
+    switch (selectedArea.type) {
+      case 'macro':
+        return {
+          type: 'FeatureCollection',
+          features: REG.features.filter((f: any) =>
+            selectedArea.acceptedRegions?.includes(f.properties.reg_name),
+          ),
+        }
+      case 'region':
+        return {
+          type: 'FeatureCollection',
+          features: PROV.features.filter((f: any) => f.properties.reg_name === selectedArea.name),
+        }
+      case 'province':
+        return {
+          type: 'FeatureCollection',
+          features: MUNI.features.filter((f: any) => f.properties.prov_name === selectedArea.name),
+        }
+      case 'municipality':
+        return {
+          type: 'FeatureCollection',
+          features: MUNI.features.filter((f: any) => f.properties.name === selectedArea.name),
+        }
+      default:
+        return italyMacro as FeatureCollection
+    }
+  }, [selectedArea])
+
+  // ---------- Points filtered by current filters (for FilterMap / charts)
+  const filteredData = useMemo(() => {
+    return (data || []).filter((d: any) => {
+      return (
+        (!filters.tipologia || d.tipologia === filters.tipologia) &&
+        (!filters.regione || d.regione === filters.regione) &&
+        (!filters.comune || d.comune === filters.comune) &&
+        (!filters.nome || d.nome === filters.nome) &&
+        (!filters.proprietario || d.proprietario === filters.proprietario) &&
+        (!filters.costruttore || d.costruttore === filters.costruttore) &&
+        (!filters.stato || d.stato === filters.stato) &&
+        (!filters.potenza || d.potenza === filters.potenza) &&
+        (!filters.estensione || d.estensione === filters.estensione)
+      )
+    })
+  }, [data, filters])
+
+  const sunburstData = useMemo(() => buildSunburst(filteredData), [filteredData])
+  // ---------- Center & Zoom from selected feature (never from filters)
+  const pointData = useMemo(() => toPointFC(filteredData), [filteredData])
+
+  const currentZoom = useMemo(() => {
+    if (!selectedArea) return { mapCenter: ITALY_CENTER, zoomLevel: ZOOM_LEVELS.country }
+    const coords = turf.centerOfMass(selectedArea.feature.geometry).geometry.coordinates
+    return {
+      mapCenter: [coords[1], coords[0]] as LatLngExpression,
+      zoomLevel: ZOOM_LEVELS[selectedArea.type],
+    }
+  }, [selectedArea])
+
+  // ---------- CLICK HANDLER (receives a FEATURE, not an event!)
+  // IMPORTANT: check specificity from deepest to highest level
+  const handleRegionClick = useCallback((feature: any) => {
+    const p = feature?.properties || {}
+
+    // 1) Municipality
+    if (p.name) {
+      const munName = p.name as string
+      setSelectedArea({ type: 'municipality', name: munName, feature })
+      setFilters((prev) => ({ ...prev, comune: munName }))
+      return
+    }
+
+    // 2) Province
+    if (p.prov_name) {
+      const provinceName = p.prov_name as string
+      setSelectedArea({ type: 'province', name: provinceName, feature })
+      // keep regione from province; DO NOT set comune here
+      setFilters((prev) => ({ ...prev, regione: p.reg_name, comune: undefined }))
+      return
+    }
+
+    // 3) Region
+    if (p.reg_name) {
+      const regionName = p.reg_name as string
+      setSelectedArea({ type: 'region', name: regionName, feature })
+      setFilters((prev) => ({ ...prev, regione: regionName, comune: undefined }))
+      return
+    }
+
+    // 4) Macro
+    if (p.Macroregione) {
+      const macro = p.Macroregione as string
+      const acceptedRegions =
+        macro === 'Nord Italia'
+          ? [
+              `Valle d'Aosta/Vallée d'Aoste`,
+              'Piemonte',
+              'Liguria',
+              'Lombardia',
+              'Veneto',
+              'Trentino-Alto Adige/Südtirol',
+              'Friuli-Venezia Giulia',
+              'Emilia-Romagna',
+            ]
+          : macro === 'Centro Italia'
+            ? ['Toscana', 'Umbria', 'Marche', 'Lazio']
+            : [
+                'Abruzzo',
+                'Molise',
+                'Campania',
+                'Puglia',
+                'Basilicata',
+                'Calabria',
+                'Sicilia',
+                'Sardegna',
+              ]
+
+      setSelectedArea({ type: 'macro', name: macro, acceptedRegions, feature })
+      setFilters({})
+      return
+    }
+  }, [])
+
+  // ---------- BACK one level
+  const handleBackClick = useCallback(() => {
+    if (!selectedArea) return
+
+    if (selectedArea.type === 'municipality') {
+      const provName = selectedArea.feature.properties?.prov_name
+      const prov = (italyProvinces as FeatureCollection).features.find(
+        (p: any) => p.properties.prov_name === provName,
+      )
+      if (prov) setSelectedArea({ type: 'province', name: provName, feature: prov })
+      setFilters((prev) => ({ ...prev, comune: undefined }))
+      return
+    }
+
+    if (selectedArea.type === 'province') {
+      const regName = selectedArea.feature.properties?.reg_name
+      const reg = (italyRegions as FeatureCollection).features.find(
+        (r: any) => r.properties.reg_name === regName,
+      )
+      if (reg) setSelectedArea({ type: 'region', name: regName, feature: reg })
+      return
+    }
+
+    // from region/macro -> top
+    setSelectedArea(null)
+    setFilters({})
+  }, [selectedArea])
+
+  // ---------- Filters -> keep map in sync (NO useEffect; do it inline)
+  const handleFilterChange = (key: keyof Filters, value?: string) => {
+    console.log('VIENE USATOOOO???????')
+    setFilters((prev) => ({ ...prev, [key]: value }))
+
+    if (key === 'regione') {
+      if (!value) {
+        // cleared region => go to country or stay macro if you want
+        setSelectedArea(null)
+      } else {
+        const r = (italyRegions as FeatureCollection).features.find(
+          (f: any) => f.properties.reg_name === value,
+        )
+        if (r) setSelectedArea({ type: 'region', name: value, feature: r })
+      }
+    }
+
+    if (key === 'comune') {
+      if (!value) {
+        // cleared comune => fallback to region if known
+        if (filters.regione) {
+          const r = (italyRegions as FeatureCollection).features.find(
+            (f: any) => f.properties.reg_name === filters.regione,
+          )
+          if (r) setSelectedArea({ type: 'region', name: filters.regione, feature: r })
+        } else {
+          setSelectedArea(null)
+        }
+      } else {
+        const m = (italyMunicipalities as FeatureCollection).features.find(
+          (f: any) => f.properties.name === value,
+        )
+        if (m) setSelectedArea({ type: 'municipality', name: value, feature: m })
+      }
+    }
+  }
+
+  return (
+    <div className="block lg:flex w-full mx-auto">
+      {/* MAP */}
+      <div className="block w-full lg:w-2/3 mt-10">
+        <div className="p-2 shadow-2xl rounded-xl">
+          <CompareMap
+            mapCenter={currentZoom.mapCenter}
+            zoomLevel={currentZoom.zoomLevel}
+            geoData={geoData}
+            pointData={pointData}
+            onBack={handleBackClick}
+            onRegionClick={handleRegionClick} // receives a FEATURE directly
+          />
+        </div>
+      </div>
+
+      {/* FILTERS + CHART */}
+      <div className="p-2 shadow-2xl rounded-xl mt-10 w-full lg:w-1/3">
+        <FilterMap
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          data={filteredData}
+          selectedArea={selectedArea}
+        />
+        <div className="flex justify-center align-center mt-4">
+          <Sumburst data={sunburstData} />
+        </div>
+      </div>
+    </div>
+  )
+}
