@@ -812,22 +812,35 @@ function FitBoundsOnData({
   useEffect(() => {
     const bounds: [number, number][] = []
 
-    const addPoly = (f: Feature<Geometry, any>) => {
+    // Helper che accetta tuple [lng, lat] in modo typesafe
+    const pushLngLat = (coord: unknown) => {
+      if (
+        Array.isArray(coord) &&
+        coord.length >= 2 &&
+        typeof coord[0] === 'number' &&
+        typeof coord[1] === 'number'
+      ) {
+        const [lng, lat] = coord as [number, number]
+        bounds.push([lat, lng]) // Leaflet vuole [lat, lng]
+      }
+    }
+
+    // Polygon: number[][][]
+    // MultiPolygon: number[][][][]
+    ;(polygons?.features || []).forEach((f) => {
       const g = f.geometry
       if (!g) return
-      const add = (c: number[]) => bounds.push([c[1], c[0]]) // [lat, lon]
-      if (g.type === 'Polygon') g.coordinates.forEach((ring: any[]) => ring.forEach(add))
-      if (g.type === 'MultiPolygon')
-        g.coordinates.forEach((poly: any[]) => poly.forEach((ring: any[]) => ring.forEach(add)))
-    }
 
-    const addPoint = (f: Feature<Point, any>) => {
-      const [lon, lat] = f.geometry.coordinates
-      bounds.push([lat, lon])
-    }
-
-    ;(polygons?.features || []).forEach(addPoly)
-    ;(points?.features || []).forEach(addPoint)
+      if (g.type === 'Polygon') {
+        g.coordinates.forEach((ring) => ring.forEach(pushLngLat))
+      } else if (g.type === 'MultiPolygon') {
+        g.coordinates.forEach((poly) => poly.forEach((ring) => ring.forEach(pushLngLat)))
+      }
+    })
+    ;(points?.features || []).forEach((f) => {
+      const coords = f.geometry?.coordinates
+      pushLngLat(coords) // anche qui passa dalla guardia
+    })
 
     if (bounds.length) {
       map.fitBounds(bounds as unknown as LatLngBoundsExpression, { padding: [30, 30] })
