@@ -1,0 +1,30 @@
+import clsx from 'clsx'
+import React from 'react'
+
+interface Props {
+  className?: string
+  loading?: 'lazy' | 'eager'
+  priority?: 'auto' | 'high' | 'low'
+}
+
+export const LogoWhite = (props: Props) => {
+  const { loading: loadingFromProps, priority: priorityFromProps, className } = props
+
+  const loading = loadingFromProps || 'lazy'
+  const priority = priorityFromProps || 'low'
+
+  return (
+    /* eslint-disable @next/next/no-img-element */
+    <img
+      alt="Logo #terrapiena"
+      width={380}
+      height={100}
+      loading={loading}
+      fetchPriority={priority}
+      decoding="async"
+      // className={clsx('max-w-[40rem] w-full h-[50px]')}
+      //src="https://raw.githubusercontent.com/payloadcms/payload/main/packages/ui/src/assets/payload-logo-light.svg"
+      src="/logo-bianco.svg"
+    />
+  )
+}

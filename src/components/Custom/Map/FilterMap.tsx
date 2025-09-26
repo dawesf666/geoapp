@@ -331,7 +331,7 @@ const FilterMap = ({ filters, onFilterChange, data, selectedArea }: FilterMapPro
 
   return (
     <div className="p-4 w-full mx-auto gap-2">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-col-3 gap-4">
         {renderSelect('Tipologia', 'tipologia')}
         {renderSelect('Regione', 'regione')}
         {renderSelect('Comune', 'comune', 'regione')}

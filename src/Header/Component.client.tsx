@@ -112,7 +112,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
           <Link href="/">
             <Logo loading="eager" priority="high" className="invert dark:invert-0 h-8 w-auto" />
           </Link>
-          <div className="py-5 lg:xl:py-8">
+          <div className="py-5 lg:xl:py-9">
             {/* Hamburger button visibile solo su mobile */}
             <button
               className="sm:hidden"
@@ -129,7 +129,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
             {/* Navigation (HeaderNav) */}
             <div
               className={`
-          absolute left-0 right-0  z-10 w-full bg-white shadow-md sm:static sm:shadow-none sm:bg-transparent sm:dark:bg-transparent grid
+          absolute left-0 right-0  z-10 w-full bg-white shadow-md sm:static sm:shadow-none sm:bg-transparent sm:dark:bg-transparent sm:block
           ${menuOpen ? 'block' : 'hidden'} 
         `}
             >

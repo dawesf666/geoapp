@@ -15,23 +15,25 @@ export const HighImpactHero: React.FC<Page['hero']> = ({ links, media, richText 
     setHeaderTheme('dark')
   })
 
-  console.log('RICH', richText)
-
   return (
     <div
-      className="relative -mt-[10.4rem] flex w-full mx-auto px-4 lg:px-16 text-white text-5xl"
-      data-theme="dark"
+      className="relative -mt-[10.4rem] flex w-full mx-auto px-4 lg:px-16 my-auto"
+      //data-theme="dark"
     >
       <div
-        className=" mb-8 z-10 relative flex items-center justify-center"
+        className=" mb-8 z-10 relative flex items-center justify-center max-w-6xl"
         //className=" mb-8 z-10 relative flex flex-start"
       >
-        <div className="md:text-center">
+        <div className="md:text-center max-w-5xl space-y-20 justify-center text-black">
           {richText && (
-            <RichText className="mb-6 text-white text-left" data={richText} enableGutter={false} />
+            <RichText
+              className="mb-6 text-[#104C82] text-left"
+              data={richText}
+              enableGutter={false}
+            />
           )}
           {Array.isArray(links) && links.length > 0 && (
-            <ul className="flex md:justify-center text-left gap-4 font-[Archivio_medium]">
+            <ul className="flex md:justify-center text-left gap-4 text-black text-4xl">
               {links.map(({ link }, i) => {
                 return (
                   <li key={i}>

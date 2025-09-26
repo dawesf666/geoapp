@@ -296,8 +296,8 @@ export default function MapBody({ data = (mockData as any).features }: { data?: 
           <Map
             mapCenter={currentView.mapCenter}
             zoomLevel={currentView.zoomLevel}
-            polygons={geoData}
-            points={pointDataWithinArea} // <- only points within selected area
+            polygons={geoData} // ✅ new prop name
+            points={pointDataWithinArea} // ✅ matches Map.tsx
             onBack={handleBackClick}
             onRegionClick={handleRegionClick}
           />

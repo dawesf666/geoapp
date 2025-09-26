@@ -47,12 +47,25 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
   const size = appearance === 'link' ? 'clear' : sizeFromProps
   const newTabProps = newTab ? { rel: 'noopener noreferrer', target: '_blank' } : {}
   const customNav =
-    'hover:bg-black hover:text-white focus:bg-black focus:text-white transition-transform duration-200 ease-in-out hover:[transform:scale(1.2)]'
+    'hover:bg-[#056A38] hover:text-white focus:bg-[#056A38]focus:text-white transition-transform duration-200 ease-in-out hover:[transform:scale(1.2)]'
 
   /* Ensure we don't break any styles set by richText */
   if (appearance === 'inline') {
     return (
       <Link className={cn(className, isNav && customNav)} href={href || url || ''} {...newTabProps}>
+        {label && label}
+        {children && children}
+      </Link>
+    )
+  }
+
+  if (appearance === 'outline') {
+    return (
+      <Link
+        className="bg-[#056A38] text-3xl rounded-xl p-6 text-white hover:bg-[[#104C82]]"
+        href={href || url || ''}
+        {...newTabProps}
+      >
         {label && label}
         {children && children}
       </Link>

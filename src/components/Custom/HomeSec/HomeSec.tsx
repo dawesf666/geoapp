@@ -15,7 +15,7 @@ const partners = [
   },
   {
     name: 'Università di Catania',
-    logo: '/unict.svg',
+    logo: '/unict.png',
     url: 'https://www.unict.it/sites/all/themes/id_theme_unict/logo.svg',
     quote: "L'Università di Catania è un centro di eccellenza nella ricerca e nell'innovazione.",
     title: 'Università di Catania',
@@ -85,96 +85,130 @@ export default async function HomePage() {
     //     </div>
     //   </section>
     // </main>
-    <main className="min-h-screen bg-white text-black space-y-10 ">
-      {/* Sezione 1 - Descrizione generale */}
+    <main className="min-h-screen bg-white text-black space-y-24 mt-10">
+      {/* Sezione 2 - Info progetto BIOTraces */}
+
       <section className="w-full  mx-auto px-4 lg:px-16">
-        <div className="block lg:flex justify-evenly align-center bg-[#0f4c82]">
-          <div className="flex-1">
-            <Image src="/alt.jpg" alt="none" className="w-full h-auto " width={800} height={700} />
+        <div className="block lg:flex justify-evenly align-left text-black">
+          <div className="flex-1 items-center">
+            <div className="flex ">
+              <Image
+                src="/biotraces-home.svg"
+                alt="none"
+                className="w-full h-auto "
+                width={800}
+                height={700}
+              />
+            </div>
           </div>
-          <div className="flex-1 flex items-center text-white">
+          <div className="flex-1 flex items-center text-black">
             <div className="block p-10">
-              <h1 className="flex justify-center text-4xl font-bold mb-10">
-                Mappa della Transizione Ecologica
+              <h1 className=" justify-center text-left text-4xl font-bold mb-10">
+                Il progetto BIOTraCes
+              </h1>
+              <p className="mb-10 text-xl font-bold">
+                Terrapiena è finanziato da HORIZON UE denominato Biodiversity And Transformative
+                Change For Plural And Nature-Positive Societies – BIOTraCes. Il progetto è
+                implementato da un consorzio composto da nove enti di ricerca europei. L’università
+                di Catania è membro del consorzio di ricerca di BIOTraCes, tramite il Dipartimento
+                di Scienze Politiche e Sociali.
+              </p>
+              <div className="">
+                <Button className="rounded-xl text-2xl uppercase bg-[#104C82] p-10">
+                  <Link href="/progetti"> Approfondisci</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="w-full  mx-auto px-4 lg:px-16">
+        <div className="block lg:flex justify-evenly align-left">
+          <div className="flex-1 flex items-center text-black">
+            <div className="block p-10 ">
+              <h1 className=" justify-center text-left text-4xl font-bold mb-10">
+                Mappa infrastrutture energetiche
               </h1>
               <p className="mb-10 text-xl font-bold">
                 La mappa è intesa come strumento cartografico digitale pubblico, finalizzato a
-                fornire informazioni georeferenziate circa l’impatto della transizione ecologica in
-                Sicilia. In particolare, la mappa renderà accessibili una gamma di informazioni
-                vasta, direttamente e indirettamente correlata agli impianti fotovoltaici di scala
-                industriale localizzati nella Valle del Simeto. Grazie a queste informazioni, e alle
-                relazioni tra loro, la mappa produrrà impatto sui tre diversi fronti della ricerca,
-                delle politiche locali e della partecipazione democratica a livello territoriale.
+                fornire informazioni georeferenziate circa l’impatto della transizione ecologica.
+                Uno strumento utile per indagare gli impatti culturali, ecologici e sociali della
+                transizione energetica e per sostenere la ricerca, le politiche socio economiche e
+                il diritto all’informazione.
               </p>
-              <p className="mb-10 text-xl font-bold">
-                La mappa è finanziata dal progetto HORIZON UE denominato Biodiversity And
-                Transformative Change For Plural And Nature-Positive Societies (da ora in avanti:
-                BIOTraces). Il progetto è implementato da un consorzio composto da nove enti di
-                ricerca europei. L’università di Catania è membro del consorzio di ricerca di
-                BIOTraces, tramite il Dipartimento di Scienze Politiche e Sociali .
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Sezione 2 - Info progetto BIOTraces */}
-      <section className="w-full  mx-auto px-4 lg:px-16">
-        <div className="block lg:flex justify-evenly align-center bg-[#046a38]">
-          <div className="flex-1 items-center text-white">
-            <div className="block p-10 ">
-              <h1 className="flex justify-center text-4xl font-bold mb-10">
-                Il progetto BIOTraces
-              </h1>
-              <p className="mb-10 text-xl font-bold">
-                BioTraCes mira a co-produrre approcci e strategie innovative che contribuiscano a
-                ripristinare la biodiversità in Europa. Sviluppando una teoria del cambiamento
-                trasformativo (ToTC), il progetto migliorerà la comprensione del ruolo fondamentale
-                svolto da valori culturali, dinamiche di potere e atteggiamenti sociali nelle sfide
-                connesse alla biodiversità, al fine di minimizzare i fattori (diretti e indiretti)
-                che portano al suo declino. Questo obiettivo sarà raggiunto facendo leva su quattro
-                principi trasversali: pluralizzazione, responsabilizzazione, politicizzazione e
-                radicamento. Impegnandosi in iniziative di trasformazione in settori ad alto impatto
-                sulla biodiversità (agricoltura e alimentazione, silvicoltura, risorse acquatiche e
-                urbanizzazione) in nove casi studio condotti negli Stati membri di tutta Europa e
-                istituendo un Influencer and Stakeholder Board, il progetto favorisce la diffusione
-                delle conoscenze e delle innovazioni sperimentate presso le sedi politiche
-                competenti a livello europeo (Commissione europea i.r.t. Green Deal, Farm to Fork e
-                Biodiversity Strategy) e nelle interfacce che mettono in dialogo scienza e politica
-                sui temi della biodiversità a livello globale (ad esempio, IPBES, IPCC).
-              </p>
+              <div className="">
+                <Button className="rounded-xl text-2xl uppercase bg-[#104C82] p-10">
+                  <Link href="/map"> Vai alla mappa</Link>
+                </Button>
+              </div>
             </div>
           </div>
           <div className="flex-1 flex ">
-            <Image src="/alt.jpg" alt="none" className="w-full h-auto " width={800} height={700} />
+            <Image
+              src="/mappa-home.svg"
+              alt="none"
+              className="w-full h-auto "
+              width={800}
+              height={700}
+            />
           </div>
         </div>
       </section>
 
-      {/* Sezione 3 - Navigazione a Blog e Mappa */}
-      <section className="w-full mx-auto flex flex-col md:flex-row gap-10 justify-center px-4 lg:px-16">
-        {/* Blog */}
+      {/* Sezione 1 - Descrizione generale */}
+      <section className="w-full  mx-auto px-4 lg:px-16">
+        <div className="block lg:flex justify-evenly align-left text-black">
+          <div className="flex-1 items-center">
+            <Image
+              src="/partecipa-home.svg"
+              alt="none"
+              className="w-full h-auto "
+              width={800}
+              height={700}
+            />
+          </div>
+          <div className="flex-1 flex items-center text-black">
+            <div className="block p-10">
+              <h1 className=" justify-center text-left text-4xl font-bold mb-10">
+                Partecipazione attiva
+              </h1>
+              <p className="mb-10 text-xl font-bold">
+                Diventa parte attiva del progetto #terrapiena: aggiungi informazioni, arricchisci i
+                contenuti e contribuisci a rendere la mappa delle infrastrutture energetiche uno
+                strumento vivo, aperto e partecipato, capace di integrare saperi locali, ricerca e
+                segnalazioni dal basso.
+              </p>
+              <div className="">
+                <Button className="rounded-xl text-2xl uppercase bg-[#104C82] p-10">
+                  <Link href="/map">Partecipa attivamente</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* <section className="w-full mx-auto flex flex-col md:flex-row gap-10 justify-center px-4 lg:px-16">
+      
         <div className="bg-black text-white rounded-2xl p-6 shadow-md w-full md:w-1/2 flex flex-col justify-between">
           <div>
             <h3 className="text-2xl font-bold mb-2">Contribuisci attivamente</h3>
             <p>
-              Grazie al tuo contributo possiamo fare la differenza, segnalando tutte quelle
-              situazioni che impattano il nostro territorio.
+              Diventa parte attiva del progetto #terrapiena: aggiungi informazioni, arricchisci i
+              contenuti e contribuisci a rendere la mappa delle infrastrutture energetiche uno
+              strumento vivo, aperto e partecipato, capace di integrare saperi locali, ricerca e
+              segnalazioni dal basso.
             </p>
-          </div>
-          <div className="mt-6">
-            <Link href="/segnala">
-              <Button
-                variant="outline"
-                className="text-black border-white hover:text-lime-600 focus:text-white transition-transform duration-200 ease-in-out hover:[transform:scale(1.2)]"
-              >
-                Segnala
+            <div className="">
+              <Button className="rounded-xl text-2xl uppercase bg-[#104C82] p-10">
+                <Link href="progetti"> Approfondisci</Link>
               </Button>
-            </Link>
+            </div>
           </div>
         </div>
 
-        {/* Mappa */}
+      
         <div className="relative rounded-2xl overflow-hidden shadow-md w-full md:w-1/2">
           <Image
             src="/map.png"
@@ -195,10 +229,10 @@ export default async function HomePage() {
             </Link>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Sezione 4 - News */}
-      <section className="w-full mx-auto px-4 lg:px-16 ">
+      {/* <section className="w-full mx-auto px-4 lg:px-16 ">
         <div className="rounded-2xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-6">
           {post?.docs && post.docs.length > 0 ? (
             // post?.doc?.map((po, key) => (
@@ -221,10 +255,10 @@ export default async function HomePage() {
             <p className="text-black">Nessun post disponibile al momento.</p>
           )}
         </div>
-      </section>
+      </section> */}
 
       <div className="">
-        <div className="bg-black text-white p-6 flex justify-center align-center text-4xl font-bold">
+        <div className="bg-[#104C82] text-white p-6 flex justify-center align-center text-4xl font-bold">
           I nostri partner
         </div>
         <InfiniteLogoScroller
@@ -232,13 +266,13 @@ export default async function HomePage() {
             // 'https://www.nestimpresasociale.com/wp-content/uploads/2023/12/cropped-NESTI_variante_03_bianco-1-1.png',
             // 'https://www.unict.it/sites/all/themes/id_theme_unict/logo.svg',
             '/nesti.png',
-            '/unict.svg',
+            '/unict.png',
             '/biotraces.png',
           ]}
           direction="left"
           speed="fast"
           pauseOnHover
-          className="border-y border-gray-200 dark:border-zinc-700 bg-black w-full"
+          className="border-y border-gray-200 dark:border-zinc-700 bg-[#104C82] w-full"
         />
       </div>
     </main>

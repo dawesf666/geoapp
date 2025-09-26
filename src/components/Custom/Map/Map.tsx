@@ -483,9 +483,169 @@
 
 //FIFTH VERSION
 // Map.tsx (CompareMap)
+// 'use client'
+// import React, { useEffect, useMemo, useState } from 'react'
+// import { MapContainer, TileLayer, useMap } from 'react-leaflet'
+// import 'leaflet/dist/leaflet.css'
+// import { LatLngBoundsExpression, LatLngExpression } from 'leaflet'
+// import { FeatureCollection } from 'geojson'
+// import BackButton from './BackButton'
+// import PolygonLayer from './markers/PolygonLayer'
+// import PointLayer from './markers/PointLayer'
+
+// type Props = {
+//   mapCenter: LatLngExpression
+//   zoomLevel: number
+//   polygons: FeatureCollection
+//   points?: FeatureCollection
+//   onBack: () => void
+//   onRegionClick: (feature: any) => void
+// }
+
+// function FitBoundsOnData({
+//   polygons,
+//   points,
+// }: {
+//   polygons: FeatureCollection
+//   points?: FeatureCollection
+// }) {
+//   const map = useMap()
+//   useEffect(() => {
+//     const bounds: [number, number][] = []
+
+//     const addPoly = (f: any) => {
+//       const g = f.geometry
+//       if (!g) return
+//       const add = (c: any) => bounds.push([c[1], c[0]])
+//       if (g.type === 'Polygon') g.coordinates.forEach((ring: any[]) => ring.forEach(add))
+//       if (g.type === 'MultiPolygon')
+//         g.coordinates.forEach((poly: any[]) => poly.forEach((ring: any[]) => ring.forEach(add)))
+//     }
+//     const addPoint = (f: any) => {
+//       const g = f.geometry
+//       if (g?.type === 'Point') {
+//         const [lon, lat] = g.coordinates
+//         bounds.push([lat, lon])
+//       }
+//     }
+
+//     ;(polygons?.features || []).forEach(addPoly)
+//     ;(points?.features || []).forEach(addPoint)
+
+//     if (bounds.length) {
+//       map.fitBounds(bounds as unknown as LatLngBoundsExpression, { padding: [30, 30] })
+//     }
+//   }, [polygons, points, map])
+
+//   return null
+// }
+
+// export default function Map({
+//   mapCenter,
+//   zoomLevel,
+//   polygons,
+//   points,
+//   onBack,
+//   onRegionClick,
+// }: Props) {
+//   const [mapKey, setMapKey] = useState(0)
+//   useEffect(() => {
+//     setMapKey((k) => k + 1)
+//   }, [mapCenter, zoomLevel])
+
+//   const { polyKey, pointKey, hasPolys, hasPoints } = useMemo(() => {
+//     const len = polygons?.features?.length ?? 0
+//     const first = len > 0 ? polygons.features[0] : undefined
+//     const sig =
+//       first?.properties?.reg_name ??
+//       first?.properties?.prov_name ??
+//       first?.properties?.name ??
+//       'empty'
+
+//     const plen = points?.features?.length ?? 0
+//     const pfirst = plen > 0 ? points.features[0] : undefined
+//     const psig = pfirst?.properties?.popupTitle ?? 'p-empty'
+
+//     return {
+//       polyKey: `poly-${len}-${sig}`,
+//       pointKey: `pts-${plen}-${psig}`,
+//       hasPolys: len > 0,
+//       hasPoints: plen > 0,
+//     }
+//   }, [polygons, points])
+
+//   // console.log(
+//   //   'poly features:',
+//   //   (polygons as any)?.features?.length,
+//   //   'types:',
+//   //   (polygons as any)?.features?.map((f: any) => f.geometry?.type).slice(0, 5),
+//   // )
+
+//   return (
+//     <div className="flex max-h-screen mt-6 rounded-md">
+//       <MapContainer
+//         key={mapKey}
+//         center={mapCenter}
+//         zoom={zoomLevel}
+//         className="rounded-xl w-full h-[1000px]"
+//         scrollWheelZoom={false}
+//       >
+//         <TileLayer
+//           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+//           attribution="&copy; OpenStreetMap contributors"
+//         />
+
+//         <BackButton
+//           title="Indietro"
+//           markerPosition={[20.27, -157]}
+//           description="Back one level"
+//           onClick={onBack}
+//         />
+
+//         {(hasPolys || hasPoints) && <FitBoundsOnData polygons={polygons} points={points} />}
+
+//         {hasPolys ? (
+//           <PolygonLayer key={polyKey} data={polygons} onFeatureClick={onRegionClick} />
+//         ) : (
+//           <div className="absolute z-[999] top-2 left-2 bg-white/90 rounded-md px-3 py-1 text-sm shadow">
+//             Nessuna geometria da mostrare
+//           </div>
+//         )}
+
+//         {hasPoints && (
+//           // <PointLayer key={pointKey} data={points!} />
+//           <PointLayer
+//             key={pointKey}
+//             data={points!}
+//             renderTooltipHTML={(f) => {
+//               const p = f.properties || {}
+//               return `<div><strong>${p.nome || 'Impianto'}</strong><br/>${[p.comune, p.regione].filter(Boolean).join(' • ')}</div>`
+//             }}
+//             renderPopupHTML={(f) => {
+//               const p = f.properties || {}
+//               return `
+//       <div style="min-width:220px;max-width:300px">
+//         <div class="mb-1"><strong>${p.nome || 'Dettaglio punto'}</strong></div>
+//         <div class="text-xs opacity-80 mb-2">${[p.regione, p.provincia, p.comune].filter(Boolean).join(' • ')}</div>
+//         <div>Tipologia: ${p.tipologia || '-'}</div>
+//         <div>Proprietario: ${p.proprietario || '-'}</div>
+//         <div>Costruttore: ${p.costruttore || '-'}</div>
+//         <div>Stato: ${p.stato || '-'}</div>
+//       </div>
+//     `
+//             }}
+//           />
+//         )}
+//       </MapContainer>
+//     </div>
+//   )
+// }
+
+// Map.tsx
+// Map.tsx
 'use client'
 import React, { useEffect, useMemo, useState } from 'react'
-import { MapContainer, TileLayer, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, useMap, Pane } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import { LatLngBoundsExpression, LatLngExpression } from 'leaflet'
 import { FeatureCollection } from 'geojson'
@@ -512,7 +672,6 @@ function FitBoundsOnData({
   const map = useMap()
   useEffect(() => {
     const bounds: [number, number][] = []
-
     const addPoly = (f: any) => {
       const g = f.geometry
       if (!g) return
@@ -528,15 +687,11 @@ function FitBoundsOnData({
         bounds.push([lat, lon])
       }
     }
-
     ;(polygons?.features || []).forEach(addPoly)
     ;(points?.features || []).forEach(addPoint)
-
-    if (bounds.length) {
+    if (bounds.length)
       map.fitBounds(bounds as unknown as LatLngBoundsExpression, { padding: [30, 30] })
-    }
   }, [polygons, points, map])
-
   return null
 }
 
@@ -563,7 +718,7 @@ export default function Map({
       'empty'
 
     const plen = points?.features?.length ?? 0
-    const pfirst = plen > 0 ? points.features[0] : undefined
+    const pfirst = plen > 0 ? points!.features[0] : undefined
     const psig = pfirst?.properties?.popupTitle ?? 'p-empty'
 
     return {
@@ -574,11 +729,12 @@ export default function Map({
     }
   }, [polygons, points])
 
+  // TEMP sanity log (remove once you see polygons)
   console.log(
-    'poly features:',
-    (polygons as any)?.features?.length,
-    'types:',
-    (polygons as any)?.features?.map((f: any) => f.geometry?.type).slice(0, 5),
+    'polygons count:',
+    polygons?.features?.length,
+    'first geom:',
+    polygons?.features?.[0]?.geometry?.type,
   )
 
   return (
@@ -588,7 +744,7 @@ export default function Map({
         center={mapCenter}
         zoom={zoomLevel}
         className="rounded-xl w-full h-[1000px]"
-        scrollWheelZoom
+        scrollWheelZoom={false}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -604,15 +760,19 @@ export default function Map({
 
         {(hasPolys || hasPoints) && <FitBoundsOnData polygons={polygons} points={points} />}
 
+        {/* Create panes with explicit z-index (points above) */}
+        <Pane name="polys" style={{ zIndex: 300, pointerEvents: 'auto' }} />
+        <Pane name="points" style={{ zIndex: 750, pointerEvents: 'auto' }} />
+
         {hasPolys ? (
-          <PolygonLayer key={polyKey} data={polygons} onFeatureClick={onRegionClick} />
+          <PolygonLayer key={polyKey} data={polygons} onFeatureClick={onRegionClick} pane="polys" />
         ) : (
           <div className="absolute z-[999] top-2 left-2 bg-white/90 rounded-md px-3 py-1 text-sm shadow">
             Nessuna geometria da mostrare
           </div>
         )}
 
-        {hasPoints && <PointLayer key={pointKey} data={points!} />}
+        {hasPoints && <PointLayer key={pointKey} data={points!} pane="points" />}
       </MapContainer>
     </div>
   )

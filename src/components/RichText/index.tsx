@@ -62,6 +62,7 @@ type Props = {
 } & React.HTMLAttributes<HTMLDivElement>
 
 export default function RichText(props: Props) {
+  console.log({ props })
   const { className, enableProse = true, enableGutter = true, ...rest } = props
   return (
     <ConvertRichText
@@ -74,6 +75,7 @@ export default function RichText(props: Props) {
           'mx-auto prose md:prose-md dark:prose-invert': enableProse,
         },
         className,
+        //'text-black',
       )}
       {...rest}
     />

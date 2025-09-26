@@ -3,10 +3,9 @@ import Link from 'next/link'
 import React from 'react'
 
 import type { Footer } from '@/payload-types'
-
 import { ThemeSelector } from '@/providers/Theme/ThemeSelector'
 import { CMSLink } from '@/components/Link'
-import { Logo } from '@/components/Logo/Logo'
+import { LogoWhite } from '@/components/Logo/LogoWhite'
 
 export async function Footer() {
   const footerData: Footer = await getCachedGlobal('footer', 1)()
@@ -14,10 +13,10 @@ export async function Footer() {
   const navItems = footerData?.navItems || []
 
   return (
-    <footer className="mt-auto border-t border-border bg-black dark:bg-card text-white">
+    <footer className="mt-auto border-t border-border bg-[#104C82] dark:bg-card text-white">
       <div className="flex items-center justify-center container p-8">
         <Link className="flex items-center" href="/">
-          <Logo />
+          <LogoWhite />
         </Link>
       </div>
 

@@ -92,7 +92,7 @@ export default async function Page({ params: paramsPromise }: Args) {
         <>
           <RenderHero {...hero} />
           {/* <RenderBlocks blocks={layout} /> */}
-          <div className="mt-10">
+          <div className="mt-20">
             {/* <RenderHero {...hero} /> */}
             <HomePage />
           </div>

@@ -24,31 +24,31 @@ export const InfiniteLogoScroller = ({
   const scrollerRef = useRef<HTMLUListElement>(null)
   const [start, setStart] = useState(false)
 
-  useEffect(() => {
-    if (scrollerRef.current && containerRef.current) {
-      const children = Array.from(scrollerRef.current.children)
-      children.forEach((child) => {
-        const clone = child.cloneNode(true)
-        scrollerRef.current?.appendChild(clone)
-      })
+  // useEffect(() => {
+  //   if (scrollerRef.current && containerRef.current) {
+  //     const children = Array.from(scrollerRef.current.children)
+  //     children.forEach((child) => {
+  //       const clone = child.cloneNode(true)
+  //       scrollerRef.current?.appendChild(clone)
+  //     })
 
-      containerRef.current.style.setProperty(
-        '--animation-direction',
-        direction === 'left' ? 'forwards' : 'reverse',
-      )
+  //     containerRef.current.style.setProperty(
+  //       '--animation-direction',
+  //       direction === 'left' ? 'forwards' : 'reverse',
+  //     )
 
-      const duration = speed === 'fast' ? '20s' : speed === 'normal' ? '40s' : '80s'
-      containerRef.current.style.setProperty('--animation-duration', duration)
+  //     const duration = speed === 'fast' ? '20s' : speed === 'normal' ? '40s' : '80s'
+  //     containerRef.current.style.setProperty('--animation-duration', duration)
 
-      setStart(true)
-    }
-  }, [direction, speed])
+  //     setStart(true)
+  //   }
+  // }, [direction, speed])
 
   return (
     <div
       ref={containerRef}
       className={cn(
-        'scroller z-10  overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_10%,white_90%,transparent)]',
+        //'scroller z-10  overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_10%,white_90%,transparent)]',
         className,
       )}
     >
@@ -65,7 +65,7 @@ export const InfiniteLogoScroller = ({
             <img
               src={logo}
               alt={`Logo ${i + 1}`}
-              className={cn('h-12 w-auto object-contain', logoClassName)}
+              className={cn('h-20 w-auto object-contain', logoClassName)}
             />
           </li>
         ))}

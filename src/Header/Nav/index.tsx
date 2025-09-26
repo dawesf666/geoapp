@@ -28,7 +28,7 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
     //     )
     //   })}
     // </nav>
-    <nav className="lg:xl:items-start text-md lg:xl:flex-end lg:xl:flex-col lg:xl:gap-6 lg:xl:text-4xl font-bold xl:gap-4 px-6 py-4 sm:p-0 uppercase mx-2 ">
+    <nav className="items-start text-md lg:xl:flex-end lg:xl:flex-col lg:xl:gap-6 lg:xl:text-3xl font-bold xl:gap-4 px-6 py-4 sm:p-0 uppercase mx-2 text-[#104C82]">
       {navItems.map(({ link }, i) => {
         return (
           <CMSLink
@@ -36,7 +36,7 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
             {...link}
             isNav={true}
             appearance="inline"
-            className="bg-transparent w-full sm:w-auto mx-2 hover:[transform:scale(1.5)]"
+            className="bg-transparent w-full sm:w-auto mx-2 hover:[transform:scale(1.5)] hover:bg-[#056A38]"
           />
         )
       })}
