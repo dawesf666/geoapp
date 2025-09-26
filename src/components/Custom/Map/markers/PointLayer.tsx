@@ -432,7 +432,8 @@ export default function PointLayer({
           ;(layer as any).openTooltip()
           ;(layer as any).setStyle?.({ weight: 3, color: '#065f46', fillOpacity: 1 })
           try {
-            layer.bringToFront?.()
+            //layer.bringToFront?.()
+            //layer.
           } catch {}
         })
         layer.on('mouseout', () => {

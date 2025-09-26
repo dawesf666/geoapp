@@ -5,16 +5,21 @@ import React, { useCallback, useMemo, useState } from 'react'
 import * as turf from '@turf/turf'
 import { LatLngExpression } from 'leaflet'
 import { FeatureCollection, Feature, Geometry } from 'geojson'
-
+import { toFeatureCollection } from '@/utilities/geojson'
 import Map from './Map'
 import FilterMap from './FilterMap'
 import Sumburst from './charts/Sumburst'
 
-import italyMacro from './statics/map_macro.json'
-import italyRegions from './statics/map_regions.json'
-import italyProvinces from './statics/map_provinces.json'
-import italyMunicipalities from './statics/map_municipalities.json'
+import italyMacroRaw from './statics/map_macro.json'
+import italyRegionsRaw from './statics/map_regions.json'
+import italyProvincesRaw from './statics/map_provinces.json'
+import italyMunicipalitiesRaw from './statics/map_municipalities.json'
 import mockData from './mockData.json'
+
+const ITALY_MACRO = toFeatureCollection(italyMacroRaw)
+const ITALY_REGIONS = toFeatureCollection(italyRegionsRaw)
+const ITALY_PROVINCES = toFeatureCollection(italyProvincesRaw)
+const ITALY_MUNICIPALITIES = toFeatureCollection(italyMunicipalitiesRaw)
 
 type Filters = {
   tipologia?: string
@@ -31,13 +36,39 @@ type Filters = {
 const ITALY_CENTER: LatLngExpression = [42.0, 12.0]
 const ZOOM_LEVELS = { country: 6, macro: 6, region: 8, province: 9, municipality: 11 } as const
 
-type AreaType = 'macro' | 'region' | 'province' | 'municipality'
-type SelectedArea = {
-  type: AreaType
+// type AreaType = 'macro' | 'region' | 'province' | 'municipality'
+// type SelectedArea = {
+//   type: AreaType
+//   name: string
+//   feature: Feature
+//   acceptedRegions?: string[]
+// } | null
+type MacroArea = {
+  type: 'macro'
   name: string
-  feature: Feature
-  acceptedRegions?: string[]
-} | null
+  acceptedRegions: string[] // obbligatorio qui
+  feature: any
+}
+
+type RegionArea = {
+  type: 'region'
+  name: string
+  feature: any
+}
+
+type ProvinceArea = {
+  type: 'province'
+  name: string
+  feature: any
+}
+
+type MunicipalityArea = {
+  type: 'municipality'
+  name: string
+  feature: any
+}
+
+type SelectedArea = MacroArea | RegionArea | ProvinceArea | MunicipalityArea | null
 
 // ---- helpers
 function toPointFC(rows: any[]): FeatureCollection {
@@ -86,39 +117,81 @@ export default function MapBody({ data = (mockData as any).features }: { data?: 
   const [filters, setFilters] = useState<Filters>({})
 
   // ---- polygons shown (drill-down only by selectedArea)
-  const geoData = useMemo<FeatureCollection>(() => {
-    if (!selectedArea) return italyMacro as FeatureCollection
+  // const geoData = useMemo<FeatureCollection>(() => {
+  //   if (!selectedArea) return italyMacro as FeatureCollection
 
-    const REG = italyRegions as FeatureCollection
-    const PROV = italyProvinces as FeatureCollection
-    const MUNI = italyMunicipalities as FeatureCollection
+  //   const REG = italyRegions as FeatureCollection
+  //   const PROV = italyProvinces as FeatureCollection
+  //   const MUNI = italyMunicipalities as FeatureCollection
 
-    switch (selectedArea.type) {
-      case 'macro':
-        return {
-          type: 'FeatureCollection',
-          features: REG.features.filter((f: any) =>
-            selectedArea.acceptedRegions?.includes(f.properties.reg_name),
-          ),
-        }
-      case 'region':
-        return {
-          type: 'FeatureCollection',
-          features: PROV.features.filter((f: any) => f.properties.reg_name === selectedArea.name),
-        }
-      case 'province':
-        return {
-          type: 'FeatureCollection',
-          features: MUNI.features.filter((f: any) => f.properties.prov_name === selectedArea.name),
-        }
-      case 'municipality':
-        return {
-          type: 'FeatureCollection',
-          features: MUNI.features.filter((f: any) => f.properties.name === selectedArea.name),
-        }
-      default:
-        return italyMacro as FeatureCollection
+  //   switch (selectedArea.type) {
+  //     case 'macro':
+  //       return {
+  //         type: 'FeatureCollection',
+  //         features: REG.features.filter((f: any) =>
+  //           selectedArea.acceptedRegions?.includes(f.properties.reg_name),
+  //         ),
+  //       }
+  //     case 'region':
+  //       return {
+  //         type: 'FeatureCollection',
+  //         features: PROV.features.filter((f: any) => f.properties.reg_name === selectedArea.name),
+  //       }
+  //     case 'province':
+  //       return {
+  //         type: 'FeatureCollection',
+  //         features: MUNI.features.filter((f: any) => f.properties.prov_name === selectedArea.name),
+  //       }
+  //     case 'municipality':
+  //       return {
+  //         type: 'FeatureCollection',
+  //         features: MUNI.features.filter((f: any) => f.properties.name === selectedArea.name),
+  //       }
+  //     default:
+  //       return italyMacro as FeatureCollection
+  //   }
+  // }, [selectedArea])
+
+  const geoData = useMemo<FeatureCollection<Geometry, any>>(() => {
+    if (!selectedArea) return ITALY_MACRO
+
+    if (selectedArea.type === 'macro') {
+      return {
+        type: 'FeatureCollection',
+        features: ITALY_REGIONS.features.filter((f: any) =>
+          selectedArea.acceptedRegions.includes(f.properties.reg_name),
+        ),
+      }
     }
+
+    if (selectedArea.type === 'region') {
+      return {
+        type: 'FeatureCollection',
+        features: ITALY_PROVINCES.features.filter(
+          (f: any) => f.properties.reg_name === selectedArea.name,
+        ),
+      }
+    }
+
+    if (selectedArea.type === 'province') {
+      return {
+        type: 'FeatureCollection',
+        features: ITALY_MUNICIPALITIES.features.filter(
+          (f: any) => f.properties.prov_name === selectedArea.name,
+        ),
+      }
+    }
+
+    if (selectedArea.type === 'municipality') {
+      return {
+        type: 'FeatureCollection',
+        features: ITALY_MUNICIPALITIES.features.filter(
+          (f: any) => f.properties.name === selectedArea.name,
+        ),
+      }
+    }
+
+    return ITALY_MACRO
   }, [selectedArea])
 
   // ---- rows filtered by filters (NOT by area; area is applied spatially below)
@@ -235,7 +308,7 @@ export default function MapBody({ data = (mockData as any).features }: { data?: 
     if (!selectedArea) return
     if (selectedArea.type === 'municipality') {
       const provName = (selectedArea.feature.properties || {}).prov_name
-      const prov = (italyProvinces as FeatureCollection).features.find(
+      const prov = (ITALY_PROVINCES as FeatureCollection).features.find(
         (p: any) => p.properties.prov_name === provName,
       )
       if (prov) setSelectedArea({ type: 'province', name: provName, feature: prov })
@@ -244,7 +317,7 @@ export default function MapBody({ data = (mockData as any).features }: { data?: 
     }
     if (selectedArea.type === 'province') {
       const regName = (selectedArea.feature.properties || {}).reg_name
-      const reg = (italyRegions as FeatureCollection).features.find(
+      const reg = (ITALY_REGIONS as FeatureCollection).features.find(
         (r: any) => r.properties.reg_name === regName,
       )
       if (reg) setSelectedArea({ type: 'region', name: regName, feature: reg })
@@ -262,7 +335,7 @@ export default function MapBody({ data = (mockData as any).features }: { data?: 
       if (!value) {
         setSelectedArea(null)
       } else {
-        const r = (italyRegions as FeatureCollection).features.find(
+        const r = (ITALY_REGIONS as FeatureCollection).features.find(
           (f: any) => f.properties.reg_name === value,
         )
         if (r) setSelectedArea({ type: 'region', name: value, feature: r })
@@ -272,7 +345,7 @@ export default function MapBody({ data = (mockData as any).features }: { data?: 
     if (key === 'comune') {
       if (!value) {
         if (filters.regione) {
-          const r = (italyRegions as FeatureCollection).features.find(
+          const r = (ITALY_REGIONS as FeatureCollection).features.find(
             (f: any) => f.properties.reg_name === filters.regione,
           )
           if (r) setSelectedArea({ type: 'region', name: filters.regione, feature: r })
@@ -280,7 +353,7 @@ export default function MapBody({ data = (mockData as any).features }: { data?: 
           setSelectedArea(null)
         }
       } else {
-        const m = (italyMunicipalities as FeatureCollection).features.find(
+        const m = (ITALY_MUNICIPALITIES as FeatureCollection).features.find(
           (f: any) => f.properties.name === value,
         )
         if (m) setSelectedArea({ type: 'municipality', name: value, feature: m })
