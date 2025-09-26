@@ -55,8 +55,8 @@ export default async function HomePage() {
 
     return posts
   }
-  const post = await getPosts(await getPayload({ config: 'post' }))
-  console.log('post', post)
+  //const post = await getPosts(await getPayload({ config: 'post' }))
+  //console.log('post', post)
   return (
     // <main>
     //   <section className="max-w-4xl mx-auto space-y-6 w-full">
