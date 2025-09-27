@@ -39,22 +39,6 @@ const partners = [
 ]
 
 export default async function HomePage() {
-  const getPosts = async (payload: Payload) => {
-    const posts = await payload.find({
-      collection: 'posts',
-      // select: {
-      //   text: true,
-      //   //select a specific field from group
-      //   group: {
-      //     number: true,
-      //   },
-      //   //select all fields from array
-      //   array: true,
-      // },
-    })
-
-    return posts
-  }
   //const post = await getPosts(await getPayload({ config: 'post' }))
   //console.log('post', post)
   return (
